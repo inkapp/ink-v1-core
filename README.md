@@ -1,2 +1,2 @@
-# lasdasadf-v1
-the official code for LASDASADF, the wallet flexing network
+# ink
+code for ink, the decentralized social network.
