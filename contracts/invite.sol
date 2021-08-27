@@ -5,7 +5,7 @@ pragma solidity ^0.8.1;
 contract invite {
     
     //can't claim tokens more than once per address
-    mapping (address => bool) claimed;
+    mapping (address => bool) public claimed;
     
     function claimToken() public {
         //send token to user
