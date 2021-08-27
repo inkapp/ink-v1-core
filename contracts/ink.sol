@@ -17,12 +17,13 @@ contract ink {
         address[] followers;
         Post[] posts;
     }
+    
     uint postId = 0;
     uint userId = 0;
     
     mapping (uint => User) userIndex;
-    mapping(uint=>Post) postIndex;
-    mapping(address=>uint) userProf;
+    mapping(uint => Post) postIndex;
+    mapping(address => uint) userProf;
     //mapping (address => address[]) followers;
     //mapping (address => address[]) following;
     //uint postId;
@@ -41,6 +42,7 @@ contract ink {
         require(!userIndex[userProf[toFollow]].activeFollowers[_follower],"You are already following this user");
         _;
     }
+    
 
     function register() public notUser(msg.sender){
         User storage u = userIndex[userId];
@@ -67,6 +69,11 @@ contract ink {
     
     function getFollowers(address _user) public validUser(_user) view returns (uint) {
         return userIndex[userProf[_user]].followers.length;
+    }
+    
+    function tipUser(address _user) public payable {
+        require(msg.sender != _user, "can't tip yourself!");
+        payable(_user).transfer(msg.value);
     }
     
 }
