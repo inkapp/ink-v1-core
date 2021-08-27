@@ -10,15 +10,15 @@ contract ink {
         uint timePosted;
     }
 
-    struct User{
-address user;
-mapping(address=>bool) activeFollowers;
-mapping (address=>bool) activeFollows;
-address[] followers;
-Post[] posts;
+    struct User {
+        address user;
+        mapping(address=>bool) activeFollowers;
+        mapping (address=>bool) activeFollows;
+        address[] followers;
+        Post[] posts;
     }
-    uint postId=0;
-    uint userId=0;
+    uint postId = 0;
+    uint userId = 0;
     
     mapping (uint => User) userIndex;
     mapping(uint=>Post) postIndex;
@@ -29,13 +29,12 @@ Post[] posts;
 
     modifier validUser(address _user){
         require(userIndex[userProf[_user]].user!=address(0),"User not registered");
-_;
+        _;
     }
 
     modifier notUser(address _user) {
         require(userIndex[userProf[_user]].user==address(0),"User already registered");
-
-_;
+        _;
     }
 
     modifier notAFollower(address toFollow,address _follower){
@@ -44,30 +43,30 @@ _;
     }
 
     function register() public notUser(msg.sender){
-User storage u=userIndex[userId];
-u.user=msg.sender;
-userProf[msg.sender]=userId;
-userId++;
+        User storage u = userIndex[userId];
+        u.user = msg.sender;
+        userProf[msg.sender] = userId;
+        userId++;
     }
     
 
     function createPost (string memory _content) public validUser(msg.sender) {
-        Post storage p=postIndex[postId];
-        p.poster=msg.sender;
-        p.content=_content;
-        p.timePosted=block.timestamp;
+        Post storage p = postIndex[postId];
+        p.poster = msg.sender;
+        p.content = _content;
+        p.timePosted = block.timestamp;
         userIndex[userProf[msg.sender]].posts.push(p);
         postId++;
     }
     
     function followUser(address _toFollow) public validUser(msg.sender) validUser(_toFollow) notAFollower(_toFollow,msg.sender) {
         require(_toFollow!= msg.sender, "you can't follow yourself.");   
-        userIndex[userProf[_toFollow]].activeFollowers[msg.sender]=true;
+        userIndex[userProf[_toFollow]].activeFollowers[msg.sender] = true;
         userIndex[userProf[_toFollow]].followers.push(msg.sender);
     }
     
     function getFollowers(address _user) public validUser(_user) view returns (uint) {
-       return userIndex[userProf[_user]].followers.length;
-           }
+        return userIndex[userProf[_user]].followers.length;
+    }
     
 }
