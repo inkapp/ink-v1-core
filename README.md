@@ -9,7 +9,7 @@ code for ink, the decentralized social network.
 ## functions
 - `register`: registers an address on the `userIndex` mapping
 - `createPost`: creates a post on the `postIndex`
-- `followUser`: follows a user
+- `followUser`: follows a user specified
 - `getFollowers`: returns the length of `activeFollowers` mapping
 ## channels
 - [twitter](https://twitter.com/viaink)
