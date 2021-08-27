@@ -6,15 +6,15 @@ code for ink, the decentralized social network.
 
 - post a blot
 - follow another user
-- claim your $INK tokens
-- invite another user to join by using $INK
+- claim your $INK token
+- invite another user to join
 - tip a user in $INK
 
 ## functions
 
 - `register`: registers an address on the `userIndex` mapping
 - `createPost`: creates a post on the `postIndex`
-- `followUser`: follows a user
+- `followUser`: follows a user specified
 - `getFollowers`: returns the length of `activeFollowers` mapping
 
 ## channels
