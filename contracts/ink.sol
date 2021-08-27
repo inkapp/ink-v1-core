@@ -13,7 +13,7 @@ contract ink {
     struct User {
         address user;
         mapping(address=>bool) activeFollowers;
-        mapping (address=>bool) activeFollows;
+        mapping(address=>bool) activeFollows;
         address[] followers;
         Post[] posts;
     }
