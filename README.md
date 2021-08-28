@@ -23,3 +23,4 @@ code for ink, the decentralized social network.
 - [github](https://github.com/inkapp)
 - [learn](https://github.com/inkapp/universe)
 - [discord](https://discord.com/invite/DQQp48kUvU)
+- [medium](https://medium.com/inkdao)
