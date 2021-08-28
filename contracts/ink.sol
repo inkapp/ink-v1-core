@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.1;
 
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 contract ink {
     
     struct Post {
@@ -15,18 +16,20 @@ contract ink {
         mapping(address=>bool) activeFollowers;
         mapping(address=>bool) activeFollows;
         address[] followers;
+        uint256 tips;
         Post[] posts;
     }
     
     uint postId = 0;
     uint userId = 0;
-    
+    IERC20 inkToken;
     mapping (uint => User) userIndex;
     mapping(uint => Post) postIndex;
     mapping(address => uint) userProf;
     //mapping (address => address[]) followers;
     //mapping (address => address[]) following;
     //uint postId;
+    event Tipped(address indexed _from,address indexed _to,uint amount);
 
     modifier validUser(address _user){
         require(userIndex[userProf[_user]].user!=address(0),"User not registered");
@@ -42,7 +45,9 @@ contract ink {
         require(!userIndex[userProf[toFollow]].activeFollowers[_follower],"You are already following this user");
         _;
     }
-    
+    constructor(address _inkToken) {
+inkToken=IERC20(_inkToken);
+    }
 
     function register() public notUser(msg.sender){
         User storage u = userIndex[userId];
@@ -71,9 +76,10 @@ contract ink {
         return userIndex[userProf[_user]].followers.length;
     }
     
-    function tipUser(address _user) public payable {
+    function tipUser(address _user,uint _amount) public validUser(msg.sender) validUser(_user){
         require(msg.sender != _user, "can't tip yourself!");
-        payable(_user).transfer(msg.value);
+        require(inkToken.transferFrom(msg.sender, _user, _amount));
+        emit Tipped(msg.sender, _user, _amount);
     }
     
 }
