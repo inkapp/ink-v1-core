@@ -11,6 +11,7 @@ contract ink {
         uint timePosted;
     }
 
+
     struct User {
         address user;
         mapping(address=>bool) activeFollowers;
@@ -22,7 +23,10 @@ contract ink {
     
     uint postId = 0;
     uint userId = 0;
+    //30% burn fee while tipping
+    uint burnFee= 30;
     IERC20 inkToken;
+    address public treasury;
     mapping (uint => User) userIndex;
     mapping(uint => Post) postIndex;
     mapping(address => uint) userProf;
@@ -45,8 +49,9 @@ contract ink {
         require(!userIndex[userProf[toFollow]].activeFollowers[_follower],"You are already following this user");
         _;
     }
-    constructor(address _inkToken) {
+    constructor(address _inkToken,address _treasury) {
 inkToken=IERC20(_inkToken);
+treasury=_treasury;
     }
 
     function register() public notUser(msg.sender){
@@ -75,10 +80,21 @@ inkToken=IERC20(_inkToken);
     function getFollowers(address _user) public validUser(_user) view returns (uint) {
         return userIndex[userProf[_user]].followers.length;
     }
+
+    function getUserPosts(address _user) public view validUser(_user) returns(Post[] memory ){
+return userIndex[userProf[_user]].posts;
+    }
     
+    function getPost(uint _postId) public view returns(Post memory){
+        return postIndex[_postId];
+    }
+    //burn tokens while tipping
     function tipUser(address _user,uint _amount) public validUser(msg.sender) validUser(_user){
         require(msg.sender != _user, "can't tip yourself!");
-        require(inkToken.transferFrom(msg.sender, _user, _amount));
+        uint toSend=_amount-((burnFee*_amount)/100);
+        uint toTreasury=_amount-toSend;
+        require(inkToken.transferFrom(msg.sender, treasury, toTreasury));
+        require(inkToken.transferFrom(msg.sender, _user, toSend));
         emit Tipped(msg.sender, _user, _amount);
     }
     
