@@ -3,7 +3,7 @@
 pragma solidity ^0.8.1;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-contract ink {
+contract Ink {
     
     struct Post {
         address poster;

@@ -14,12 +14,34 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  let inkToken;
+  //ink core
+  const Ink = await hre.ethers.getContractFactory("Ink");
 
-  await greeter.deployed();
+  //ink token
+  inkToken = await hre.ethers.getContractFactory("InkToken");
+  inkToken = await inkToken.deploy();
+  console.log("InkToken deployed to:", inkToken.address);
+  //deploy ink token
+  await inkToken.deployed();
 
-  console.log("Greeter deployed to:", greeter.address);
+  //deploy ink core with necessary constructor values
+  const ink = await Ink.deploy(
+    inkToken.address,
+    "0x3cc46CEC3F11c9d16D959bDb690fEC8Eaa9e4945"
+  );
+
+  await ink.deployed();
+
+  console.log("Ink deployed to:", ink.address);
+
+  //testing contract functions
+  const reg = await ink.register();
+  await ink.createPost("This is my first Post");
+  const getPost = await ink.getPost(0);
+
+  console.log("getting post onchain");
+  console.log(getPost);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
