@@ -38,10 +38,20 @@ async function main() {
   //testing contract functions
   const reg = await ink.register();
   await ink.createPost("This is my first Post");
-  const getPost = await ink.getPost(0);
+  await ink.createPost("This is my second Post");
+  await ink.createPost("This is my third Post");
+  await ink.createPost("This is my fourth Post");
+  await ink.createPost("This is my fifth Post");
+  //const getPost = await ink.getPost(0);
 
-  console.log("getting post onchain");
-  console.log(getPost);
+  // console.log("getting post onchain");
+  // console.log(getPost);
+
+  //getting full user details
+  const userDetails = await ink.getUser(
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  );
+  console.log(userDetails);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

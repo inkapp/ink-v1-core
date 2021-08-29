@@ -6,6 +6,7 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 contract Ink {
     
     struct Post {
+        uint id;
         address poster;
         string content;
         uint timePosted;
@@ -16,6 +17,15 @@ contract Ink {
         address user;
         mapping(address=>bool) activeFollowers;
         mapping(address=>bool) activeFollows;
+        address[] followers;
+        uint256 tips;
+        uint256 id;
+        Post[] posts;
+
+    }
+
+    struct UserDeets{
+        address user;
         address[] followers;
         uint256 tips;
         Post[] posts;
@@ -57,6 +67,7 @@ treasury=_treasury;
     function register() public notUser(msg.sender){
         User storage u = userIndex[userId];
         u.user = msg.sender;
+        u.id=userId;
         userProf[msg.sender] = userId;
         userId++;
     }
@@ -67,6 +78,7 @@ treasury=_treasury;
         p.poster = msg.sender;
         p.content = _content;
         p.timePosted = block.timestamp;
+        p.id=postId;
         userIndex[userProf[msg.sender]].posts.push(p);
         postId++;
     }
@@ -83,6 +95,13 @@ treasury=_treasury;
 
     function getUserPosts(address _user) public view validUser(_user) returns(Post[] memory ){
 return userIndex[userProf[_user]].posts;
+    }
+
+    function getUser(address _user)public view validUser(_user) returns (UserDeets memory u){
+        u.user=userIndex[userProf[_user]].user;
+        u. followers=userIndex[userProf[_user]].followers;
+        u.tips=userIndex[userProf[_user]].tips;
+        u. posts=userIndex[userProf[_user]].posts;
     }
     
     function getPost(uint _postId) public view returns(Post memory){
