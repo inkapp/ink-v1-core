@@ -10,6 +10,7 @@ contract Ink {
         address poster;
         string content;
         uint timePosted;
+        uint tips;
     }
 
 
@@ -18,10 +19,13 @@ contract Ink {
         mapping(address=>bool) activeFollowers;
         mapping(address=>bool) activeFollows;
         address[] followers;
-        uint256 tips;
+        uint256 totalTips;
         uint256 id;
+        //0 = closed/not a user
+        //1 = normal
+        //2 = og
+        uint8 status;
         Post[] posts;
-
     }
 
     struct UserDeets{
@@ -29,6 +33,7 @@ contract Ink {
         address[] followers;
         uint256 tips;
         Post[] posts;
+        uint status;
     }
     
     uint postId = 0;
@@ -59,6 +64,13 @@ contract Ink {
         require(!userIndex[userProf[toFollow]].activeFollowers[_follower],"You are already following this user");
         _;
     }
+
+    modifier postExists(uint _id) {
+        require(postIndex[_id].timePosted>0,'Non-Existent post');
+        _;
+    }
+
+    
     constructor(address _inkToken,address _treasury) {
 inkToken=IERC20(_inkToken);
 treasury=_treasury;
@@ -68,6 +80,7 @@ treasury=_treasury;
         User storage u = userIndex[userId];
         u.user = msg.sender;
         u.id=userId;
+        u.status=1;
         userProf[msg.sender] = userId;
         userId++;
     }
@@ -100,7 +113,7 @@ return userIndex[userProf[_user]].posts;
     function getUser(address _user)public view validUser(_user) returns (UserDeets memory u){
         u.user=userIndex[userProf[_user]].user;
         u. followers=userIndex[userProf[_user]].followers;
-        u.tips=userIndex[userProf[_user]].tips;
+        u.tips=userIndex[userProf[_user]].totalTips;
         u. posts=userIndex[userProf[_user]].posts;
     }
     
@@ -108,13 +121,20 @@ return userIndex[userProf[_user]].posts;
         return postIndex[_postId];
     }
     //burn tokens while tipping
-    function tipUser(address _user,uint _amount) public validUser(msg.sender) validUser(_user){
+    function _tipUser(address _user,uint _amount) internal validUser(msg.sender) validUser(_user) returns(bool){
         require(msg.sender != _user, "can't tip yourself!");
         uint toSend=_amount-((burnFee*_amount)/100);
         uint toTreasury=_amount-toSend;
+        userIndex[userProf[msg.sender]].totalTips+=_amount;
         require(inkToken.transferFrom(msg.sender, treasury, toTreasury));
         require(inkToken.transferFrom(msg.sender, _user, toSend));
         emit Tipped(msg.sender, _user, _amount);
+        return true;
+    }
+
+    function tipOnPost(address _dst,uint _amount,uint _postId) public postExists(_postId){
+    require(_tipUser(_dst, _amount));
+    postIndex[_postId].tips+=_amount;
     }
     
 }
