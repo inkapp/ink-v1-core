@@ -107,7 +107,7 @@ treasury=_treasury;
     }
 
     function getUserPosts(address _user) public view validUser(_user) returns(Post[] memory ){
-return userIndex[userProf[_user]].posts;
+       return userIndex[userProf[_user]].posts;
     }
 
     function getUser(address _user)public view validUser(_user) returns (UserDeets memory u){
@@ -123,7 +123,7 @@ return userIndex[userProf[_user]].posts;
     //burn tokens while tipping
     function _tipUser(address _user,uint _amount) internal validUser(msg.sender) validUser(_user) returns(bool){
         require(msg.sender != _user, "can't tip yourself!");
-        uint toSend=_amount-((burnFee*_amount)/100);
+        uint toSend=_amount-((burnFee * _amount) / 100);
         uint toTreasury=_amount-toSend;
         userIndex[userProf[msg.sender]].totalTips+=_amount;
         require(inkToken.transferFrom(msg.sender, treasury, toTreasury));
