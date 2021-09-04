@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.1;
 
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 contract Ink {
     
     struct Post {
@@ -49,6 +49,8 @@ contract Ink {
     //mapping (address => address[]) following;
     //uint postId;
     event Tipped(address indexed _from,address indexed _to,uint amount);
+    event NewPost(uint _postId,address _owner,uint _timePosted);
+    event NewFollow(address _followed,address _follower,uint _currentFollowerCount);
 
     modifier validUser(address _user){
         require(userIndex[userProf[_user]].user!=address(0),"User not registered");
@@ -86,20 +88,23 @@ treasury=_treasury;
     }
     
 
-    function createPost (string memory _content) public validUser(msg.sender) {
+    function createPost (string memory _content) external validUser(msg.sender) {
         Post storage p = postIndex[postId];
         p.poster = msg.sender;
         p.content = _content;
         p.timePosted = block.timestamp;
         p.id=postId;
         userIndex[userProf[msg.sender]].posts.push(p);
+        emit NewPost(postId, msg.sender, block.timestamp);
         postId++;
+        
     }
     
     function followUser(address _toFollow) public validUser(msg.sender) validUser(_toFollow) notAFollower(_toFollow,msg.sender) {
         require(_toFollow!= msg.sender, "you can't follow yourself.");   
         userIndex[userProf[_toFollow]].activeFollowers[msg.sender] = true;
         userIndex[userProf[_toFollow]].followers.push(msg.sender);
+        emit NewFollow(_toFollow, msg.sender, userIndex[userProf[_toFollow]].followers.length);
     }
     
     function getFollowers(address _user) public validUser(_user) view returns (uint) {
@@ -120,6 +125,24 @@ treasury=_treasury;
     function getPost(uint _postId) public view returns(Post memory){
         return postIndex[_postId];
     }
+
+//returns details about posts given the starting and ending indexes
+//not really efficient as it might contain empty structs in the array
+//only used as post indexing fallback
+//original source of truth would be the subgraph
+    function getPosts(uint _start,uint _end) public view returns(Post[] memory p){
+        require(_end>_start,'Fetch:ending index cannot be less than or equal to starting index');
+        uint totalLength=_end-_start;
+        p= new Post[](totalLength);
+        for(uint i;i<totalLength;i++){
+            if(postIndex[_start+i].timePosted!=0){
+p[i]=getPost(_start+i);
+            }
+        }
+
+    }
+
+
     //burn tokens while tipping
     function _tipUser(address _user,uint _amount) internal validUser(msg.sender) validUser(_user) returns(bool){
         require(msg.sender != _user, "can't tip yourself!");

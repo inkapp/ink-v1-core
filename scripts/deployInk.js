@@ -42,16 +42,16 @@ async function main() {
   await ink.createPost("This is my third Post");
   await ink.createPost("This is my fourth Post");
   await ink.createPost("This is my fifth Post");
-  //const getPost = await ink.getPost(0);
+  const getPost = await ink.getPosts(0, 10);
 
-  // console.log("getting post onchain");
-  // console.log(getPost);
+  console.log("getting post onchain");
+  console.log(getPost);
 
   //getting full user details
-  const userDetails = await ink.getUser(
-    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-  );
-  console.log(userDetails);
+  //const userDetails = await ink.getUser(
+  //  "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  // );
+  //console.log(userDetails);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
