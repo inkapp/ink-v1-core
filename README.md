@@ -9,6 +9,7 @@ code for ink, the decentralized social network.
 - claim your $INK token
 - invite another user to join
 - tip a user in $INK
+- tip a post in $INK
 
 ## functions
 
